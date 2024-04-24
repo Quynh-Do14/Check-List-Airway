@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Modal, StyleSheet, Text, Pressable, View, TextInput, KeyboardAvoidingView } from 'react-native';
 type Props = {
     modalVisible: boolean,
@@ -14,14 +14,32 @@ const ModalNote = (props: Props) => {
     const onSaveNote = () => {
         listCheck?.map(it => {
             if (it.id == dataModal.id) {
-                setListCheck((prev: any[]) => prev?.map((it) => {
-                    it.note = note
-                    return it
+                setListCheck((prev: any[]) => prev?.map((item) => {
+                    if (item.id == dataModal?.id) {
+                        item.note = note
+                        return item
+                    }
+                    else {
+                        return item
+                    }
                 }))
             }
         })
+        setNote("")
         setModalVisible(!modalVisible)
     }
+    const onCloseModal = () => {
+        setNote("")
+        setModalVisible(!modalVisible)
+    }
+    useEffect(() => {
+        listCheck?.map((item: any) => {
+            if (item.id == dataModal?.id && item.note) {
+                setNote(item.note)
+            }
+        })
+    }, [listCheck, dataModal])
+
     return (
         <View>
             <Modal
@@ -58,7 +76,7 @@ const ModalNote = (props: Props) => {
                         <View style={styles.btnContainer}>
                             <Pressable
                                 style={[styles.button, styles.buttonClose]}
-                                onPress={() => setModalVisible(!modalVisible)}>
+                                onPress={onCloseModal}>
                                 <Text style={styles.textStyle}>Đóng</Text>
                             </Pressable>
                             <Pressable
@@ -147,7 +165,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#363636",
         paddingVertical: 4,
         width: "100%",
-        marginBottom:16
+        marginBottom: 16
     },
     textTitle: {
         color: "#FFFFFF",

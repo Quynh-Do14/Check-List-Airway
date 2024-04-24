@@ -6,12 +6,18 @@ import { data, user } from "../../core/common/data";
 import { useRecoilValue } from 'recoil';
 import { ListCheckState } from '../../core/atoms/listCheck/listCheckState';
 import Constants from '../../core/common/constant';
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
+
 import ModalNote from './modalNote';
+import { convertTime } from '../../infrastructure/helper/helper';
+import DialogNotificationCommon from '../../infrastructure/common/components/dialog/dialogNotification';
 const DetailScreen = ({ navigation }: any) => {
     const [value, setValue] = useState<string>("1");
     const [listCheck, setListCheck] = useState<Array<any>>([]);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
-    const [dataModal, setDataModal] = useState<any>()
+    const [dataModal, setDataModal] = useState<any>();
+    const [isDialogConfirm, setIsDialogConfirm] = useState<boolean>(false);
+
     const checkData = useRecoilValue(ListCheckState);
 
     const date = new Date();
@@ -33,11 +39,64 @@ const DetailScreen = ({ navigation }: any) => {
             }
         })
     }
-    console.log("listCheck", listCheck);
 
     const onOpenModal = (it: any) => {
         setModalVisible(true)
         setDataModal(it)
+    }
+    const generatePdf = async () => {
+        try {
+            const htmlContent = `
+            <html>
+            <body>
+                <h1>${checkData.label}</h1>
+                <h2>${checkData.userSelect.name} - ${checkData.userSelect.position}</h2>
+                <table style="width: 100%; background-color: #D9FFE6; border-collapse: collapse; border: 1px solid #E5E7EB; font-size: 1.5rem; font-weight: bold; text-align: left;">
+                    <thead class="text-xs text-center">
+                        <tr>
+                        <th style="width: 40%; padding: 6px; border: 1px solid #E5E7EB;">Tên</th>
+                        <th style="width: 20%; padding: 6px; border: 1px solid #E5E7EB;">Thời gian chọn</th>
+                        <th style="width: 40%; padding: 6px; border: 1px solid #E5E7EB;">Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-center">
+                        ${listCheck?.map((it, index) => {
+                return `
+                               <tr key="${index}" style="border: 1px solid #E5E7EB;">
+                                    <td style="width: 40%; border: 1px solid #E5E7EB; padding: 6px; font-weight: medium; color: #374151; white-space: nowrap;">${checkData.label === "Trực điều hành" ? it.primary : (checkData.label === "Trực hiệp đồng" && it.secondary)}</td>
+                                    <td style="width: 20%; border: 1px solid #E5E7EB; padding: 6px;"><p style="color: #f17024;">${convertTime(it.submitTime)}</p></td>
+                                    <td style="width: 40%; border: 1px solid #E5E7EB; padding: 6px;"><p style="color: #f17024;">${it.note || null}</p></td>
+                                </tr>
+                            `;
+            }).join('')}
+                    </tbody>
+                </table>
+            </body>
+        </html>`;
+            const options = {
+                html: htmlContent,
+                fileName: `${checkData.userSelect.name}-${checkData.userSelect.position}-${date}`,
+                directory: 'Documents',
+            };
+
+            let file = await RNHTMLtoPDF.convert(options)
+            console.log(file.filePath);
+            if (file) {
+                onOpenDialogConfirm();
+                setListCheck([]);
+            }
+
+        } catch (error) {
+            console.error('Error converting HTML to PDF:', error);
+        }
+    }
+    console.log("listCheck", listCheck);
+
+    const onOpenDialogConfirm = () => {
+        setIsDialogConfirm(true)
+    }
+    const onCloseDialogConfirm = () => {
+        setIsDialogConfirm(false)
     }
     return (
         <MainLayout
@@ -45,13 +104,29 @@ const DetailScreen = ({ navigation }: any) => {
             onGoBack={onBack}
             isBackButton={true}
         >
-            <View style={styles.paddingName}>
-                <Text style={styles.textTitle}>
-                    {checkData.userSelect.name} - {checkData.userSelect.position}
-                </Text>
-            </View>
-            <View style={styles.content}>
 
+            <View style={styles.content}>
+                <View style={[
+                    styles.paddingName,
+                    {
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center"
+                    }
+                ]}>
+                    <Text style={styles.textTitle}>
+                        {checkData.userSelect.name} - {checkData.userSelect.position}
+                    </Text>
+                    <TouchableOpacity
+                        style={styles.btnExport}
+                        onPress={generatePdf}
+                    >
+                        <Text style={styles.textTitle}>
+                            Xuất File PDF
+                        </Text>
+                    </TouchableOpacity>
+                </View>
                 <View style={styles.paddingName}>
                     <Text style={styles.textTitle}>
                         {checkData.checkName}
@@ -91,7 +166,14 @@ const DetailScreen = ({ navigation }: any) => {
                                             &&
                                             <TouchableOpacity onPress={() => onOpenModal(it)}>
                                                 <View>
-                                                    <Image source={require('../../../assets/images/note.png')}/>
+                                                    {
+                                                        condtion[0]?.note
+                                                            ?
+                                                            <Image source={require('../../../assets/images/noteActive.png')} />
+                                                            :
+                                                            <Image source={require('../../../assets/images/note.png')} />
+                                                    }
+
                                                 </View>
                                             </TouchableOpacity>
                                         }
@@ -127,6 +209,10 @@ const DetailScreen = ({ navigation }: any) => {
                 dataModal={dataModal}
                 listCheck={listCheck}
             />
+            <DialogNotificationCommon
+                visible={isDialogConfirm}
+                onConfirm={onCloseDialogConfirm}
+                message={"Bạn đã xuất File PDF thành công"} />
         </MainLayout >
     )
 }
@@ -158,7 +244,7 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        gap: 4,
+        gap: 8,
         paddingHorizontal: 4,
         paddingVertical: 10,
         borderRadius: 4,
@@ -167,7 +253,7 @@ const styles = StyleSheet.create({
     paddingName: {
         borderBottomColor: "#979797",
         borderBottomWidth: 2,
-        marginBottom: 10,
+        // marginBottom: 10,
         backgroundColor: "#363636",
         paddingVertical: 16,
         paddingHorizontal: 16,
@@ -177,7 +263,7 @@ const styles = StyleSheet.create({
         textAlign: "left",
         fontFamily: "Roboto Regular",
         fontWeight: "700",
-        fontSize: 16,
+        fontSize: 14,
     },
     textBox: {
         color: "#FFFFFF",
@@ -185,5 +271,10 @@ const styles = StyleSheet.create({
         fontFamily: "Roboto Regular",
         fontWeight: "500",
         fontSize: 14,
+    },
+    btnExport: {
+        backgroundColor: "#8687E7",
+        borderRadius: 4,
+        padding: 8
     },
 })

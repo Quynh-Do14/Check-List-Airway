@@ -101,6 +101,41 @@ export const data = [
 
         ]
     },
+    {
+        title: "Tàu bay gặp vấn đề về hệ thống phanh (bị trục trặc)",
+        content: [
+            {
+                id: 1,
+                primary: "Xác nhận lại tin tức nhận từ tổ lái",
+                secondary: "Chuyển tiếp các yêu cầu của tổ lái đến các đầu mối liên quan"
+            },
+            {
+                id: 2,
+                primary: "Yêu cầu tổ lái thông báo tình trạng và ý định",
+                secondary: "Hỗ trợ quan sát và hoạch định kế hoạch điều hành bay"
+            },
+            {
+                id: 3,
+                primary: "Thông báo cho tổ lái về các thông số đường CHC",
+                secondary: "Báo cáo Trực cán bộ giám sát cơ sở/Trực cán bộ Đài KSKL"
+            },
+            {
+                id: 4,
+                primary: "Tăng cường quan sát tàu bay",
+                secondary: "Báo cáo Kíp trưởng TB-HĐB"
+            },
+            {
+                id: 5,
+                primary: "Hoạch định phương án điều hành bay",
+                secondary: "Khi tình huống kết thúc,thông báo lại các nơi liên quan"
+            },
+            {
+                id: 6,
+                primary: "Hỏi các yêu cầu trợ giúp mặt đất",
+                secondary: "Tổng hợp báo cáo và lưu lại theo quy định."
+            },
+        ]
+    }
 
 ]
 

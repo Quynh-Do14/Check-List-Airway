@@ -43,7 +43,7 @@ const ListCheckScreen = ({ navigation }: any) => {
 
     return (
         <MainLayout
-            title={"Trang chủ"}
+            title={"Danh sách"}
             onGoBack={onBack}
             isBackButton={true}
         >
