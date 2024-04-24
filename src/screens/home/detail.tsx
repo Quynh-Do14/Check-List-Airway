@@ -1,15 +1,17 @@
 import React, { useState } from 'react'
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import MainLayout from '../../infrastructure/common/layouts/layout';
 import { Checkbox, RadioButton } from 'react-native-paper';
 import { data, user } from "../../core/common/data";
 import { useRecoilValue } from 'recoil';
 import { ListCheckState } from '../../core/atoms/listCheck/listCheckState';
 import Constants from '../../core/common/constant';
+import ModalNote from './modalNote';
 const DetailScreen = ({ navigation }: any) => {
     const [value, setValue] = useState<string>("1");
     const [listCheck, setListCheck] = useState<Array<any>>([]);
-
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [dataModal, setDataModal] = useState<any>()
     const checkData = useRecoilValue(ListCheckState);
 
     const date = new Date();
@@ -23,7 +25,7 @@ const DetailScreen = ({ navigation }: any) => {
         }]
         setListCheck([
             ...listCheck,
-            arr,
+            ...arr,
         ])
         listCheck?.map(it => {
             if (it.id == value.id) {
@@ -31,14 +33,25 @@ const DetailScreen = ({ navigation }: any) => {
             }
         })
     }
+    console.log("listCheck", listCheck);
 
+    const onOpenModal = (it: any) => {
+        setModalVisible(true)
+        setDataModal(it)
+    }
     return (
         <MainLayout
             title={checkData.label}
             onGoBack={onBack}
             isBackButton={true}
         >
+            <View style={styles.paddingName}>
+                <Text style={styles.textTitle}>
+                    {checkData.userSelect.name} - {checkData.userSelect.position}
+                </Text>
+            </View>
             <View style={styles.content}>
+
                 <View style={styles.paddingName}>
                     <Text style={styles.textTitle}>
                         {checkData.checkName}
@@ -73,6 +86,16 @@ const DetailScreen = ({ navigation }: any) => {
                                                     it.secondary
                                             }</Text>
                                         </View>
+                                        {
+                                            condtion[0]?.id == it.id
+                                            &&
+                                            <TouchableOpacity onPress={() => onOpenModal(it)}>
+                                                <View>
+                                                    <Image source={require('../../../assets/images/note.png')}/>
+                                                </View>
+                                            </TouchableOpacity>
+                                        }
+
                                     </View>
                                 </View>
                             )
@@ -97,6 +120,13 @@ const DetailScreen = ({ navigation }: any) => {
 
                 </ScrollView>
             </View >
+            <ModalNote
+                modalVisible={modalVisible}
+                setModalVisible={setModalVisible}
+                setListCheck={setListCheck}
+                dataModal={dataModal}
+                listCheck={listCheck}
+            />
         </MainLayout >
     )
 }

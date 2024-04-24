@@ -7,6 +7,10 @@ export const ListCheckState = atom({
         // uri: '',
         label: "",
         checkName: "",
+        userSelect: {
+            name: "",
+            position: "",
+        },
         data: []
     }, // default value (aka initial value)
 });

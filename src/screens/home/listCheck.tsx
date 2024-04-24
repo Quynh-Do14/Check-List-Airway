@@ -29,6 +29,7 @@ const ListCheckScreen = ({ navigation }: any) => {
         setDataCheck({
             label: label,
             checkName: checkName,
+            userSelect: userSelect,
             data: content
         })
         navigation.navigate(
