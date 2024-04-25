@@ -4,27 +4,48 @@ type Props = {
     modalVisible: boolean,
     setModalVisible: Function,
     dataModal: any
-    listCheck: Array<any>,
-    setListCheck: Function,
+    listCheckPrimary: Array<any>,
+    setListCheckPrimary: Function,
+    listCheckSecondary: Array<any>,
+    setListCheckSecondary: Function,
 }
 const ModalNote = (props: Props) => {
-    const { modalVisible, setModalVisible, dataModal, listCheck, setListCheck } = props
+    const { modalVisible, setModalVisible, dataModal, listCheckPrimary, setListCheckPrimary, listCheckSecondary, setListCheckSecondary } = props
     const [note, setNote] = useState<string>('')
+    console.log('dataModal', dataModal);
 
     const onSaveNote = () => {
-        listCheck?.map(it => {
-            if (it.id == dataModal.id) {
-                setListCheck((prev: any[]) => prev?.map((item) => {
-                    if (item.id == dataModal?.id) {
-                        item.note = note
-                        return item
-                    }
-                    else {
-                        return item
-                    }
-                }))
-            }
-        })
+        if (dataModal.type == 'Trực điều hành') {
+            listCheckPrimary?.map(it => {
+                if (it.id == dataModal.id && it.type == dataModal.type) {
+                    setListCheckPrimary((prev: any[]) => prev?.map((item) => {
+                        if (item.id == dataModal?.id) {
+                            item.note = note
+                            return item
+                        }
+                        else {
+                            return item
+                        }
+                    }))
+                }
+            })
+        }
+        else if (dataModal.type == 'Trực điều hành') {
+            listCheckSecondary?.map(it => {
+                if (it.id == dataModal.id && it.type == dataModal.type) {
+                    setListCheckSecondary((prev: any[]) => prev?.map((item) => {
+                        if (item.id == dataModal?.id) {
+                            item.note = note
+                            return item
+                        }
+                        else {
+                            return item
+                        }
+                    }))
+                }
+            })
+        }
+
         setNote("")
         setModalVisible(!modalVisible)
     }
@@ -33,12 +54,17 @@ const ModalNote = (props: Props) => {
         setModalVisible(!modalVisible)
     }
     useEffect(() => {
-        listCheck?.map((item: any) => {
-            if (item.id == dataModal?.id && item.note) {
+        listCheckPrimary?.map((item: any) => {
+            if (item.id == dataModal?.id && item.type == dataModal.type && item.note) {
                 setNote(item.note)
             }
         })
-    }, [listCheck, dataModal])
+        listCheckSecondary?.map((item: any) => {
+            if (item.id == dataModal?.id && item.type == dataModal.type && item.note) {
+                setNote(item.note)
+            }
+        })
+    }, [listCheckPrimary, listCheckSecondary, dataModal])
 
     return (
         <View>

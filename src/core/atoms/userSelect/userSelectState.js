@@ -2,12 +2,15 @@ import { atom } from "recoil";
 
 export const UserSelectState = atom({
     key: 'USER_SELECT_STATE', // unique ID (with respect to other atoms/selectors)
-    default: {
-        // isLoading: false,
-        // uri: '',
-        data: {
+    default: [
+        {
+            type: "",
             name: "",
             position: "",
-        }
-    }, // default value (aka initial value)
+            checkData: {
+                title: "",
+                content: [],
+            },
+        },
+    ]
 });

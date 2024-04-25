@@ -9,128 +9,54 @@ import { UserSelectState } from "../../core/atoms/userSelect/userSelectState";
 import { ListCheckState } from "../../core/atoms/listCheck/listCheckState";
 
 const ListCheckScreen = ({ navigation }: any) => {
-    const [listSelect, setListSelect] = useState<Array<any>>([]);
     const [, setDataCheck] = useRecoilState<any>(ListCheckState);
-    const userSelect = useRecoilValue(UserSelectState).data;
 
-    const onChangeSelect = (value: number) => {
-        setListSelect([
-            ...listSelect,
-            value
-        ])
-        listSelect?.map(it => {
-            if (it == value) {
-                setListSelect(prev => prev?.filter(it => it !== value))
-            }
-        })
-    }
-
-    const onNavigateDetail = (content: Array<any>, checkName: string, label: string) => {
+    const onNavigateDetail = (it: object) => {
         setDataCheck({
-            label: label,
-            checkName: checkName,
-            userSelect: userSelect,
-            data: content
+            data: it
         })
         navigation.navigate(
-            "DetailScreen",
+            "HomeScreen",
         );
     }
 
-    const onBack = () => {
-        navigation.goBack()
-    }
 
     return (
         <MainLayout
             title={"Danh sách"}
-            onGoBack={onBack}
-            isBackButton={true}
         >
             <View style={styles.content}>
                 <View style={styles.paddingName}>
                     <Text style={styles.textTitle}>
-                        {userSelect.name} - {userSelect.position}
+                        Danh sách
                     </Text>
                 </View>
-                {
-                    data.map((it, index) => {
-                        return (
-                            <View key={index}>
-                                <TouchableOpacity onPress={() => onChangeSelect(index)}>
+                <ScrollView>
+                    <View>
+                        {
+                            data.map((it, index) => {
+                                return (
                                     <View
-                                        style={styles.boxContainer}
+                                        key={index}
+                                        style={{
+                                            marginBottom: 16
+                                        }}
                                     >
-                                        <Text style={styles.textSelect}>
-                                            {it.title}
-                                        </Text>
+                                        <TouchableOpacity onPress={() => onNavigateDetail(it)}>
+                                            <View
+                                                style={styles.boxContainer}
+                                            >
+                                                <Text style={styles.textSelect}>
+                                                    {it.title}
+                                                </Text>
+                                            </View>
+                                        </TouchableOpacity>
                                     </View>
-                                </TouchableOpacity>
-
-                                <View
-                                    style={{
-                                        padding: 8
-                                    }}>
-                                    {
-                                        listSelect.includes(index)
-                                            ?
-                                            Constants.Type.List.map((item, indexX) => (
-                                                <View
-                                                    style={styles.boxContainerSelect}
-                                                    key={indexX}
-                                                >
-                                                    <TouchableOpacity
-                                                        style={styles.touchNavigate}
-                                                        onPress={() => onNavigateDetail(it.content, it.title, item.label)}>
-                                                        <Text style={styles.textSelect}>
-                                                            {item.label}
-                                                        </Text>
-                                                        <Image source={require('../../../assets/images/arrowLeft.png')} />
-                                                    </TouchableOpacity>
-                                                </View>
-                                            ))
-                                            : null
-                                    }
-                                </View>
-                            </View>
-                        )
-                    })
-                }
-                {/* <List.Section title="Accordions">
-                    {
-                        data.map((it, index) => {
-                            return (
-                                <List.Accordion
-                                    style={styles.boxContainer}
-                                    key={index}
-                                    title={
-                                        <Text style={styles.textTitle}>
-                                            {it.title}
-                                        </Text>
-                                    }
-                                    left={props => <List.Icon {...props} icon="folder" />}
-                                >
-                                    {
-                                        Constants.Type.List.map((item, indexX) => (
-                                            <List.Item
-                                                key={indexX}
-                                                title={
-                                                    <TouchableOpacity onPress={() => onNavigateDetail(it.content)}>
-                                                        <Text style={styles.textTitle}>
-                                                            {item.label}
-                                                        </Text>
-                                                    </TouchableOpacity>
-                                                }
-                                            />
-                                        ))
-                                    }
-
-
-                                </List.Accordion>
-                            )
-                        })
-                    }
-                </List.Section> */}
+                                )
+                            })
+                        }
+                    </View>
+                </ScrollView>
             </View>
         </MainLayout>
     )
@@ -155,7 +81,7 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-start",
-        backgroundColor: "#363636",
+        backgroundColor: "#FBF1EF",
         height: "100%",
         paddingVertical: 16,
         paddingHorizontal: 16,
@@ -187,7 +113,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10
     },
     textTitle: {
-        color: "#FFFFFF",
+        color: "#191313",
         textAlign: "left",
         fontFamily: "Roboto Regular",
         fontWeight: "700",

@@ -7,52 +7,106 @@ import { useRecoilValue } from 'recoil';
 import { ListCheckState } from '../../core/atoms/listCheck/listCheckState';
 import Constants from '../../core/common/constant';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
+// import RNFetchBlob from 'rn-fetch-blob';
 
 import ModalNote from './modalNote';
 import { convertTime } from '../../infrastructure/helper/helper';
 import DialogNotificationCommon from '../../infrastructure/common/components/dialog/dialogNotification';
+import { UserSelectState } from '../../core/atoms/userSelect/userSelectState';
 const DetailScreen = ({ navigation }: any) => {
     const [value, setValue] = useState<string>("1");
-    const [listCheck, setListCheck] = useState<Array<any>>([]);
+    const [listCheckPrimary, setListCheckPrimary] = useState<Array<any>>([]);
+    const [listCheckSecondary, setListCheckSecondary] = useState<Array<any>>([]);
+
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [dataModal, setDataModal] = useState<any>();
     const [isDialogConfirm, setIsDialogConfirm] = useState<boolean>(false);
 
+    const userData = useRecoilValue(UserSelectState);
     const checkData = useRecoilValue(ListCheckState);
+    console.log("listCheckPrimary", listCheckPrimary);
+    console.log("listCheckSecondary", listCheckSecondary);
 
     const date = new Date();
     const onBack = () => {
         navigation.goBack()
     }
-    const onChangeCheck = (value: any) => {
-        const arr = [{
-            ...value,
-            submitTime: date
-        }]
-        setListCheck([
-            ...listCheck,
-            ...arr,
+    const onChangeCheck = (value: any, item: any) => {
+        let arrPrimay: any[] = [];
+        let arrSecondary: any[] = [];
+
+        if (item.type == "Trực điều hành") {
+            arrPrimay = [{
+                id: value.id,
+                type: item.type,
+                check: value.primary,
+                submitTime: date
+            }]
+        }
+        else if (item.type == "Trực hiệp đồng") {
+            arrSecondary = [{
+                id: value.id,
+                type: item.type,
+                check: value.secondary,
+                submitTime: date
+            }]
+        }
+        setListCheckPrimary([
+            ...listCheckPrimary,
+            ...arrPrimay,
         ])
-        listCheck?.map(it => {
-            if (it.id == value.id) {
-                setListCheck(prev => prev?.filter(it => it.id !== value.id))
+        listCheckPrimary?.map(it => {
+            if (it.id == value.id && it.type == item.type) {
+                setListCheckPrimary(prev => prev?.filter(it => it.id !== value.id))
+            }
+        })
+        setListCheckSecondary([
+            ...listCheckSecondary,
+            ...arrSecondary,
+        ])
+        listCheckSecondary?.map(it => {
+            if (it.id == value.id && it.type == item.type) {
+                setListCheckSecondary(prev => prev?.filter(it => it.id !== value.id))
             }
         })
     }
 
-    const onOpenModal = (it: any) => {
+    const onOpenModal = (it: any, item: any) => {
         setModalVisible(true)
-        setDataModal(it)
+        setDataModal(
+            {
+                ...it,
+                type: item.type
+            })
     }
     const generatePdf = async () => {
+        let name: string[] = []
         try {
+            // <h1>${checkData.label}</h1>
+            // <h2>${checkData.userSelect.name} - ${checkData.userSelect.position}</h2>
             const htmlContent = `
             <html>
             <body>
-                <h1>${checkData.label}</h1>
-                <h2>${checkData.userSelect.name} - ${checkData.userSelect.position}</h2>
-                <table style="width: 100%; background-color: #D9FFE6; border-collapse: collapse; border: 1px solid #E5E7EB; font-size: 1.5rem; font-weight: bold; text-align: left;">
+                ${userData.map((item, indexX) => {
+                let arr = []
+                if (item.type === "Trực điều hành") {
+                    arr = listCheckPrimary
+                }
+                else if (item.type === "Trực hiệp đồng") {
+                    arr = listCheckSecondary
+                }
+                return `
+                    <table key="${indexX}" style="width: 100%; background-color: #D9FFE6; border-collapse: collapse; border: 1px solid #E5E7EB; font-size: 1.5rem; font-weight: bold; text-align: left;">
                     <thead class="text-xs text-center">
+                        <tr className="w-full text-center text-2xl">
+                        <th
+                            scope="col"
+                            colSpan={3}
+                            className="px-6 py-3 text-[1.5rem] font-bold border border-slate-300"
+                        >
+                            ${item.name} - ${item.type}
+                        </th>
+                        </tr>
                         <tr>
                         <th style="width: 40%; padding: 6px; border: 1px solid #E5E7EB;">Tên</th>
                         <th style="width: 20%; padding: 6px; border: 1px solid #E5E7EB;">Thời gian chọn</th>
@@ -60,22 +114,25 @@ const DetailScreen = ({ navigation }: any) => {
                         </tr>
                     </thead>
                     <tbody class="text-center">
-                        ${listCheck?.map((it, index) => {
-                return `
-                               <tr key="${index}" style="border: 1px solid #E5E7EB;">
-                                    <td style="width: 40%; border: 1px solid #E5E7EB; padding: 6px; font-weight: medium; color: #374151; white-space: nowrap;">${checkData.label === "Trực điều hành" ? it.primary : (checkData.label === "Trực hiệp đồng" && it.secondary)}</td>
+                        ${arr?.map((it, index) => {
+                    return `
+                            <tr key="${index}" style="border: 1px solid #E5E7EB;">
+                                    <td style="width: 40%; border: 1px solid #E5E7EB; padding: 6px; font-weight: medium; color: #374151;">${it.check} </td>
                                     <td style="width: 20%; border: 1px solid #E5E7EB; padding: 6px;"><p style="color: #f17024;">${convertTime(it.submitTime)}</p></td>
-                                    <td style="width: 40%; border: 1px solid #E5E7EB; padding: 6px;"><p style="color: #f17024;">${it.note || null}</p></td>
+                                    <td style="width: 40%; border: 1px solid #E5E7EB; padding: 6px;"><p style="color: #f17024;">${it.note || ""}</p></td>
                                 </tr>
                             `;
-            }).join('')}
+                }).join('')}
                     </tbody>
                 </table>
+    `
+            })}
+
             </body>
         </html>`;
             const options = {
                 html: htmlContent,
-                fileName: `${checkData.userSelect.name}-${checkData.userSelect.position}-${date}`,
+                fileName: `${date}`,
                 directory: 'Documents',
             };
 
@@ -83,14 +140,13 @@ const DetailScreen = ({ navigation }: any) => {
             console.log(file.filePath);
             if (file) {
                 onOpenDialogConfirm();
-                setListCheck([]);
+                setListCheckPrimary([]);
             }
 
         } catch (error) {
             console.error('Error converting HTML to PDF:', error);
         }
     }
-    console.log("listCheck", listCheck);
 
     const onOpenDialogConfirm = () => {
         setIsDialogConfirm(true)
@@ -100,7 +156,7 @@ const DetailScreen = ({ navigation }: any) => {
     }
     return (
         <MainLayout
-            title={checkData.label}
+            title={""}
             onGoBack={onBack}
             isBackButton={true}
         >
@@ -111,13 +167,13 @@ const DetailScreen = ({ navigation }: any) => {
                     {
                         display: "flex",
                         flexDirection: "row",
-                        justifyContent: "space-between",
+                        justifyContent: "flex-end",
                         alignItems: "center"
                     }
                 ]}>
-                    <Text style={styles.textTitle}>
+                    {/* <Text style={styles.textTitle}>
                         {checkData.userSelect.name} - {checkData.userSelect.position}
-                    </Text>
+                    </Text> */}
                     <TouchableOpacity
                         style={styles.btnExport}
                         onPress={generatePdf}
@@ -127,63 +183,77 @@ const DetailScreen = ({ navigation }: any) => {
                         </Text>
                     </TouchableOpacity>
                 </View>
-                <View style={styles.paddingName}>
-                    <Text style={styles.textTitle}>
-                        {checkData.checkName}
-                    </Text>
-                </View>
+
                 <ScrollView style={{
                     paddingVertical: 16,
                     paddingHorizontal: 16,
                 }}>
 
-
                     <View>
-                        {checkData.data.map((it: any, index: number) => {
-                            let condtion: any[] = [];
-                            condtion = listCheck.filter(item => item.id == it.id)
-                            return (
-                                <View key={index}>
-                                    <View
-                                        style={styles.checkBoxContainer}
-                                    >
-                                        <RadioButton color="#e5e5e5" value={it.id} status={`${condtion[0]?.id == it.id ? "checked" : "unchecked"}`} onPress={() => onChangeCheck(it)} />
-                                        <View
-                                            style={styles.flex1}
-                                        >
-                                            <Text style={styles.textBox}>{
-                                                checkData.label && checkData.label === "Trực điều hành"
-                                                    ?
-                                                    it.primary
-                                                    :
-                                                    checkData.label && checkData.label === "Trực hiệp đồng"
-                                                    &&
-                                                    it.secondary
-                                            }</Text>
+                        {
+                            userData.map((item, indexX) => {
+                                return (
+                                    <View key={indexX}>
+                                        <View style={styles.paddingName}>
+                                            <Text style={styles.textTitle}>
+                                                {item.name} - {item.type}
+                                            </Text>
                                         </View>
-                                        {
-                                            condtion[0]?.id == it.id
-                                            &&
-                                            <TouchableOpacity onPress={() => onOpenModal(it)}>
-                                                <View>
-                                                    {
-                                                        condtion[0]?.note
-                                                            ?
-                                                            <Image source={require('../../../assets/images/noteActive.png')} />
-                                                            :
-                                                            <Image source={require('../../../assets/images/note.png')} />
-                                                    }
+                                        {checkData.data.content.map((it: any, index: number) => {
+                                            let condtion: any[] = [];
+                                            if (item.type === "Trực điều hành") {
+                                                condtion = listCheckPrimary.filter(item => item.id == it.id)
+                                            }
+                                            if (item.type === "Trực hiệp đồng") {
+                                                condtion = listCheckSecondary.filter(item => item.id == it.id)
+                                            }
+                                            return (
+                                                <View key={index}>
+                                                    <View
+                                                        style={styles.checkBoxContainer}
+                                                    >
+                                                        <RadioButton color="#191313" value={it.id} status={`${condtion[0]?.id == it.id ? "checked" : "unchecked"}`} onPress={() => onChangeCheck(it, item)} />
+                                                        <View
+                                                            style={styles.flex1}
+                                                        >
+                                                            <Text style={styles.textBox}>{
+                                                                item.type && item.type === "Trực điều hành"
+                                                                    ?
+                                                                    it.primary
+                                                                    :
+                                                                    item.type && item.type === "Trực hiệp đồng"
+                                                                    &&
+                                                                    it.secondary
+                                                            }</Text>
+                                                        </View>
+                                                        {
+                                                            condtion[0]?.id == it.id && condtion[0]?.type == item.type
+                                                            &&
+                                                            <TouchableOpacity onPress={() => onOpenModal(it, item)}>
+                                                                <View>
+                                                                    {
+                                                                        condtion[0]?.note
+                                                                            ?
+                                                                            <Image source={require('../../../assets/images/noteActive.png')} />
+                                                                            :
+                                                                            <Image source={require('../../../assets/images/note.png')} />
+                                                                    }
 
+                                                                </View>
+                                                            </TouchableOpacity>
+                                                        }
+
+                                                    </View>
                                                 </View>
-                                            </TouchableOpacity>
+                                            )
                                         }
-
+                                        )}
                                     </View>
-                                </View>
-                            )
+                                )
+                            })
                         }
-                        )}
                     </View>
+
                     {/* <View>
                         {checkData.data.map((it: any, index: number) => (
                             <View key={index}>
@@ -205,9 +275,11 @@ const DetailScreen = ({ navigation }: any) => {
             <ModalNote
                 modalVisible={modalVisible}
                 setModalVisible={setModalVisible}
-                setListCheck={setListCheck}
                 dataModal={dataModal}
-                listCheck={listCheck}
+                setListCheckPrimary={setListCheckPrimary}
+                listCheckPrimary={listCheckPrimary}
+                setListCheckSecondary={setListCheckSecondary}
+                listCheckSecondary={listCheckSecondary}
             />
             <DialogNotificationCommon
                 visible={isDialogConfirm}
@@ -221,9 +293,10 @@ export default DetailScreen
 
 const styles = StyleSheet.create({
     content: {
-        backgroundColor: "#1C1C1E",
+        backgroundColor: "#FBF1EF",
         borderWidth: 4,
-        borderColor: "#363636",
+        borderColor: "#FBF1EF",
+        elevation: 6,
         height: "100%",
         borderTopLeftRadius: 16,
         borderTopRightRadius: 16,
@@ -240,7 +313,7 @@ const styles = StyleSheet.create({
         flex: 1
     },
     checkBoxContainer: {
-        backgroundColor: "#363636",
+        backgroundColor: "#FBF1EF",
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
@@ -251,22 +324,22 @@ const styles = StyleSheet.create({
         marginBottom: 16
     },
     paddingName: {
-        borderBottomColor: "#979797",
+        borderBottomColor: "#191313",
         borderBottomWidth: 2,
         // marginBottom: 10,
-        backgroundColor: "#363636",
-        paddingVertical: 16,
+        backgroundColor: "#FBF1EF",
+        paddingVertical: 12,
         paddingHorizontal: 16,
     },
     textTitle: {
-        color: "#FFFFFF",
+        color: "#191313",
         textAlign: "left",
         fontFamily: "Roboto Regular",
         fontWeight: "700",
         fontSize: 14,
     },
     textBox: {
-        color: "#FFFFFF",
+        color: "#191313",
         textAlign: "left",
         fontFamily: "Roboto Regular",
         fontWeight: "500",

@@ -10,7 +10,7 @@ import {
   SafeAreaView,
 
 } from 'react-native';
-import HomeScreen from './src/screens/home';
+import HomeScreen from './src/screens/home/user';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { PaperProvider } from 'react-native-paper';
@@ -22,7 +22,7 @@ const Stack = createNativeStackNavigator();
 const StackNavigator = () => {
   return (
     <Stack.Navigator
-      initialRouteName={"HomeScreen"}
+      initialRouteName={"ListCheckScreen"}
       screenOptions={{ headerShown: false }}
     >
 

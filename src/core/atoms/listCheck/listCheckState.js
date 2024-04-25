@@ -5,12 +5,9 @@ export const ListCheckState = atom({
     default: {
         // isLoading: false,
         // uri: '',
-        label: "",
-        checkName: "",
-        userSelect: {
-            name: "",
-            position: "",
-        },
-        data: []
+        data: {
+            title: "",
+            content: [],
+        }
     }, // default value (aka initial value)
 });
