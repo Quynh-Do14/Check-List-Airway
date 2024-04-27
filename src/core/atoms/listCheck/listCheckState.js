@@ -1,3 +1,4 @@
+
 import { atom } from "recoil";
 
 export const ListCheckState = atom({
@@ -5,9 +6,12 @@ export const ListCheckState = atom({
     default: {
         // isLoading: false,
         // uri: '',
-        data: {
-            title: "",
-            content: [],
-        }
+        label: "",
+        checkName: "",
+        userSelect: {
+            name: "",
+            position: "",
+        },
+        data: []
     }, // default value (aka initial value)
 });

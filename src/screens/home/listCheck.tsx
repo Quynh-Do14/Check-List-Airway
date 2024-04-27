@@ -1,7 +1,7 @@
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import MainLayout from "../../infrastructure/common/layouts/layout";
-import { Button, List, RadioButton } from "react-native-paper";
-import { useState } from "react";
+import { Button, List, RadioButton, TextInput } from "react-native-paper";
+import { useEffect, useState } from "react";
 import { data } from "../../core/common/data";
 import Constants from "../../core/common/constant";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -10,55 +10,91 @@ import { ListCheckState } from "../../core/atoms/listCheck/listCheckState";
 
 const ListCheckScreen = ({ navigation }: any) => {
     const [, setDataCheck] = useRecoilState<any>(ListCheckState);
+    const userSelect = useRecoilValue(UserSelectState).data;
+    const [textSearch, setTextSearch] = useState<string>("");
+    const [dataFilter, setDataFilter] = useState<Array<any>>([]);
 
-    const onNavigateDetail = (it: object) => {
+    console.log("userSelect", userSelect);
+
+    const onNavigateDetail = (content: Array<any>, checkName: string) => {
         setDataCheck({
-            data: it
+            label: userSelect.label,
+            checkName: checkName,
+            userSelect: userSelect,
+            data: content
         })
         navigation.navigate(
-            "HomeScreen",
+            "DetailScreen",
         );
+        setTextSearch("")
     }
 
+    const onBack = () => {
+        navigation.goBack()
+    }
+
+    const onChange = (value: string) => {
+        setTextSearch(value)
+        let arrConvert = data.filter((it: any) => it.title.toLowerCase().includes(value.toLowerCase()))
+        setDataFilter(arrConvert)
+
+    }
+    useEffect(() => {
+        setDataFilter(data)
+    }, [data])
 
     return (
         <MainLayout
-            title={"Danh sách"}
+            title={"Tình huống"}
+            onGoBack={onBack}
+            isBackButton={true}
         >
+            <KeyboardAvoidingView
+                style={{
+                    paddingHorizontal: 16,
+                }}>
+                <View>
+                    <Text style={styles.labelStyle}>
+                        Tìm kiếm tình huống
+                    </Text>
+                    <TextInput
+                        value={textSearch}
+                        onChangeText={onChange}
+                        placeholderTextColor={"#ffffff"}
+                        style={[
+                            { position: "relative" },
+                            styles.fontStyle,
+                            styles.inputStyle
+                        ]} />
+                </View>
+            </KeyboardAvoidingView>
             <View style={styles.content}>
                 <View style={styles.paddingName}>
                     <Text style={styles.textTitle}>
-                        Danh sách
+                        {userSelect.name} - {userSelect.position}
                     </Text>
                 </View>
-                <ScrollView>
-                    <View>
-                        {
-                            data.map((it, index) => {
-                                return (
+                {
+                    dataFilter.map((it, index) => {
+                        return (
+                            <View key={index}>
+                                <TouchableOpacity onPress={() => onNavigateDetail(it.content, it.title)}>
                                     <View
-                                        key={index}
-                                        style={{
-                                            marginBottom: 16
-                                        }}
+                                        style={styles.checkBoxContainer}
                                     >
-                                        <TouchableOpacity onPress={() => onNavigateDetail(it)}>
-                                            <View
-                                                style={styles.boxContainer}
-                                            >
-                                                <Text style={styles.textSelect}>
-                                                    {it.title}
-                                                </Text>
-                                            </View>
-                                        </TouchableOpacity>
+                                        <View style={styles.flexBox}>
+                                            <Text style={styles.textSelect}>{it.title}</Text>
+                                            {/* <Image source={require('../../../assets/images/arrowLeft.png')} /> */}
+                                        </View>
                                     </View>
-                                )
-                            })
-                        }
-                    </View>
-                </ScrollView>
+                                </TouchableOpacity>
+                            </View>
+                        )
+                    })
+                }
+
             </View>
-        </MainLayout>
+        </MainLayout >
     )
 }
 
@@ -83,28 +119,25 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start",
         backgroundColor: "#FBF1EF",
         height: "100%",
+        elevation: 6,
         paddingVertical: 16,
         paddingHorizontal: 16,
         borderTopLeftRadius: 16,
         borderTopRightRadius: 16,
     },
-    boxContainer: {
-        backgroundColor: "#8687E7",
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 4,
-    },
-    boxContainerSelect: {
-        backgroundColor: "#979797",
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 12,
-        marginBottom: 8
-    },
-    touchNavigate: {
+    flexBox: {
         display: "flex",
         flexDirection: "row",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
+    checkBoxContainer: {
+        backgroundColor: "#8687E7",
+        gap: 4,
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+        borderRadius: 4,
+        marginBottom: 16
     },
     paddingName: {
         borderBottomColor: "#979797",
@@ -125,5 +158,26 @@ const styles = StyleSheet.create({
         fontFamily: "Roboto Regular",
         fontWeight: "700",
         fontSize: 14,
+    },
+    labelStyle: {
+        color: "#2C2C2E",
+        fontFamily: "Roboto Regular",
+        fontWeight: "600",
+        fontSize: 14,
+        position: "absolute",
+        top: 0,
+        zIndex: 9
+    },
+
+    inputStyle: {
+        borderBottomWidth: 1,
+        borderBottomColor: "#2C2C2E",
+        marginBottom: 12,
+        backgroundColor: "#f8ded9",
+    },
+    fontStyle: {
+        color: "#2C2C2E",
+        fontFamily: "Roboto Regular",
+        fontWeight: "900",
     },
 })

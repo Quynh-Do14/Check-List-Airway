@@ -22,7 +22,7 @@ const Stack = createNativeStackNavigator();
 const StackNavigator = () => {
   return (
     <Stack.Navigator
-      initialRouteName={"ListCheckScreen"}
+      initialRouteName={"HomeScreen"}
       screenOptions={{ headerShown: false }}
     >
 
