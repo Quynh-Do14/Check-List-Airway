@@ -11,9 +11,13 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import ModalNote from './modalNote';
 import { convertTime } from '../../infrastructure/helper/helper';
 import DialogNotificationCommon from '../../infrastructure/common/components/dialog/dialogNotification';
+import Signature from './signature';
 const DetailScreen = ({ navigation }: any) => {
     const [listCheck, setListCheck] = useState<Array<any>>([]);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [modalSignature, setModalSignature] = useState<boolean>(false);
+    const [signature, setSignature] = useState<any>();
+
     const [dataModal, setDataModal] = useState<any>();
     const [isDialogConfirm, setIsDialogConfirm] = useState<boolean>(false);
     const [dataFilter, setDataFilter] = useState<Array<any>>([]);
@@ -66,12 +70,14 @@ const DetailScreen = ({ navigation }: any) => {
                                <tr key="${index}" style="border: 1px solid #E5E7EB;">
                                     <td style="width: 40%; border: 1px solid #E5E7EB; padding: 6px; font-weight: medium; color: #374151; white-space: nowrap;">${checkData.label === "Trực điều hành" ? it.primary : (checkData.label === "Trực hiệp đồng" && it.secondary)}</td>
                                     <td style="width: 20%; border: 1px solid #E5E7EB; padding: 6px;"><p style="color: #f17024;">${convertTime(it.submitTime)}</p></td>
-                                    <td style="width: 40%; border: 1px solid #E5E7EB; padding: 6px;"><p style="color: #f17024;">${it.note || null}</p></td>
+                                    <td style="width: 40%; border: 1px solid #E5E7EB; padding: 6px;"><p style="color: #f17024;">${it.note || ""}</p></td>
                                 </tr>
                             `;
             }).join('')}
                     </tbody>
                 </table>
+                <h3>Chữ kí</h3>
+                <img src="${signature}" />
             </body>
         </html>`;
             const options = {
@@ -91,14 +97,11 @@ const DetailScreen = ({ navigation }: any) => {
             console.error('Error converting HTML to PDF:', error);
         }
     }
-    console.log("listCheck", listCheck);
 
-    const onOpenDialogConfirm = () => {
-        setIsDialogConfirm(true)
+    const onOpenSignature = () => {
+        setModalSignature(true)
     }
-    const onCloseDialogConfirm = () => {
-        setIsDialogConfirm(false)
-    }
+
     const onChange = (value: string) => {
         setTextSearch(value)
         if (checkData.label && checkData.label === "Trực điều hành") {
@@ -113,12 +116,24 @@ const DetailScreen = ({ navigation }: any) => {
     useEffect(() => {
         setDataFilter(checkData.data)
     }, [checkData])
+
+    const onOpenDialogConfirm = () => {
+        setIsDialogConfirm(true)
+    }
+    const onCloseDialogConfirm = () => {
+        setIsDialogConfirm(false)
+    }
+
     return (
         <MainLayout
             title={checkData.label}
             onGoBack={onBack}
             isBackButton={true}
         >
+            {
+                signature
+                && <Image source={signature} />
+            }
             <View
                 style={{
                     paddingHorizontal: 16,
@@ -136,17 +151,37 @@ const DetailScreen = ({ navigation }: any) => {
                         display: "flex",
                         flexDirection: "row",
                         justifyContent: "space-between",
-                        alignItems: "center"
+                        alignItems: "flex-start"
                     }
                 ]}>
-                    <Text style={styles.textTitle}>
-                        {checkData.userSelect.name} - {checkData.userSelect.position}
-                    </Text>
+                    <View
+                        style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "space-between",
+                            alignItems: "flex-start",
+                            gap: 4
+                        }}
+                    >
+                        <Text style={styles.textTitle}>
+                            {checkData.userSelect.name} - {checkData.userSelect.position}
+                        </Text>
+                        <TouchableOpacity
+                            style={styles.btnSignature}
+                            onPress={onOpenSignature}
+                        >
+                            <Text style={styles.textSelect}>
+                                {signature ? "Đã có chữ kí" : "Kí tên"}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+
+
                     <TouchableOpacity
                         style={styles.btnExport}
                         onPress={generatePdf}
                     >
-                        <Text style={styles.textTitle}>
+                        <Text style={styles.textSelect}>
                             Xuất File PDF
                         </Text>
                     </TouchableOpacity>
@@ -155,7 +190,7 @@ const DetailScreen = ({ navigation }: any) => {
                 <KeyboardAvoidingView
                     style={{
                         paddingHorizontal: 16,
-                        marginTop:8
+                        marginTop: 8,
                     }}>
                     <View>
                         <Text style={styles.labelStyle}>
@@ -224,21 +259,7 @@ const DetailScreen = ({ navigation }: any) => {
                         }
                         )}
                     </View>
-                    {/* <View>
-                        {checkData.data.map((it: any, index: number) => (
-                            <View key={index}>
-                                <View
-                                    style={styles.checkBoxContainer}
-                                >
-                                    <RadioButton color="#e5e5e5" value={it.id} status={`${listCheck.includes(it.id) ? "checked" : "unchecked"}`} onPress={() => onChangeCheck(it.id)} />
-                                    <View>
-                                        <Text style={styles.textBox}>Trực phụ</Text>
-                                        <Text style={styles.textBox}>{it.secondary}</Text>
-                                    </View>
-                                </View>
-                            </View>
-                        ))}
-                    </View> */}
+
 
                 </ScrollView>
             </View >
@@ -248,6 +269,11 @@ const DetailScreen = ({ navigation }: any) => {
                 setListCheck={setListCheck}
                 dataModal={dataModal}
                 listCheck={listCheck}
+            />
+            <Signature
+                modalVisible={modalSignature}
+                setModalVisible={setModalSignature}
+                setSignature={setSignature}
             />
             <DialogNotificationCommon
                 visible={isDialogConfirm}
@@ -307,6 +333,13 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         fontSize: 14,
     },
+    textSelect: {
+        color: "#FFFFFF",
+        textAlign: "left",
+        fontFamily: "Roboto Regular",
+        fontWeight: "700",
+        fontSize: 14,
+    },
     textBox: {
         color: "#191313",
         textAlign: "left",
@@ -318,6 +351,12 @@ const styles = StyleSheet.create({
         backgroundColor: "#8687E7",
         borderRadius: 4,
         padding: 8
+    },
+    btnSignature: {
+        backgroundColor: "#8687E7",
+        borderRadius: 4,
+        paddingHorizontal: 12,
+        paddingVertical: 8
     },
     labelStyle: {
         color: "#2C2C2E",
