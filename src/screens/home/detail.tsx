@@ -11,7 +11,7 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import ModalNote from './modalNote';
 import { convertTime } from '../../infrastructure/helper/helper';
 import DialogNotificationCommon from '../../infrastructure/common/components/dialog/dialogNotification';
-import Signature from './signature';
+import SignatureModal from './signature';
 const DetailScreen = ({ navigation }: any) => {
     const [listCheck, setListCheck] = useState<Array<any>>([]);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -76,8 +76,12 @@ const DetailScreen = ({ navigation }: any) => {
             }).join('')}
                     </tbody>
                 </table>
-                <h3>Chữ kí</h3>
-                <img src="${signature}" />
+                <div style="display: flex; flex-direction: column; justifyContent: flex-start; align-items: center;">
+                    <h2 style="font-size: 24px; margin-bottom: 20px;">Chữ kí</h2>
+                    <div>
+                        <img src="${signature}" style="width: 200px; height: auto;" />
+                    </div>
+                </div>
             </body>
         </html>`;
             const options = {
@@ -91,6 +95,7 @@ const DetailScreen = ({ navigation }: any) => {
             if (file) {
                 onOpenDialogConfirm();
                 setListCheck([]);
+                setSignature(null);
             }
 
         } catch (error) {
@@ -273,7 +278,7 @@ const DetailScreen = ({ navigation }: any) => {
                 dataModal={dataModal}
                 listCheck={listCheck}
             />
-            <Signature
+            <SignatureModal
                 modalVisible={modalSignature}
                 setModalVisible={setModalSignature}
                 setSignature={setSignature}

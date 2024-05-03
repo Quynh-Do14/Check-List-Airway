@@ -17,12 +17,13 @@ import { PaperProvider } from 'react-native-paper';
 import DetailScreen from './src/screens/home/detail';
 import ListCheckScreen from './src/screens/home/listCheck';
 import { RecoilRoot } from 'recoil';
+import LoginScreen from './src/screens/home/login';
 
 const Stack = createNativeStackNavigator();
 const StackNavigator = () => {
   return (
     <Stack.Navigator
-      initialRouteName={"HomeScreen"}
+      initialRouteName={"LoginScreen"}
       screenOptions={{ headerShown: false }}
     >
 
@@ -31,6 +32,7 @@ const StackNavigator = () => {
         component={BottomMenu}
         options={{ headerShown: false }}
       /> */}
+      <Stack.Screen name={"LoginScreen"} component={LoginScreen} />
       <Stack.Screen name={"HomeScreen"} component={HomeScreen} />
       <Stack.Screen name={"ListCheckScreen"} component={ListCheckScreen} />
       <Stack.Screen name={"DetailScreen"} component={DetailScreen} />

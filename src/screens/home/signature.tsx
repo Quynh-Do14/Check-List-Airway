@@ -8,37 +8,64 @@ import {
     Modal,
     Alert,
     Pressable,
+    Image,
 } from 'react-native';
 import SignatureCapture from 'react-native-signature-capture';
+import SignatureScreen from "react-native-signature-canvas";
+
 type Props = {
     modalVisible: boolean,
     setModalVisible: Function,
     setSignature: Function,
 }
-const Signature = (props: Props) => {
+const SignatureModal = (props: Props) => {
     const { modalVisible, setModalVisible, setSignature } = props
-    const signatureRef = useRef<any>(null);
 
-    const saveSign = () => {
-        signatureRef.current.saveImage();
-    };
+    // const signatureRef = useRef<any>(null);
 
-    const resetSign = () => {
-        signatureRef.current.resetImage();
-    };
+    // const saveSign = () => {
+    //     signatureRef.current.saveImage();
+    // };
 
-    const onSaveEvent = (result: any) => {
-        console.log("result", result.pathName);
-        setSignature(result.pathName);
-        setModalVisible(false);
-    };
+    // const resetSign = () => {
+    //     signatureRef.current.resetImage();
+    // };
 
-    const onDragEvent = () => {
-        console.log('dragged');
-    };
+    // const onSaveEvent = (result: any) => {
+    //     console.log("result", result.pathName);
+    //     setSignature(result.pathName);
+    //     setModalVisible(false);
+    // };
+
+    // const onDragEvent = () => {
+    //     console.log('dragged');
+    // };
     const onCloseModal = () => {
+        ref.current.redo();
         setModalVisible(!modalVisible)
     }
+    const ref = useRef<any>();
+
+    const handleOK = (signature: any) => {
+        ref.current.readSignature();
+        setSignature(signature);
+        setModalVisible(!modalVisible)
+    };
+
+    const handleEmpty = () => {
+    };
+
+    const handleClear = () => {
+        ref.current.redo();
+    };
+
+    // Called after end of stroke
+    const handleEnd = () => {
+    };
+
+    const handleData = (data: any) => {
+        console.log(data);
+    };
     return (
 
         <View>
@@ -49,7 +76,8 @@ const Signature = (props: Props) => {
                 onRequestClose={() => {
                     Alert.alert('Modal has been closed.');
                     setModalVisible(!modalVisible);
-                }}>
+                }}
+            >
                 <View style={styles.centeredView}>
 
                     <View style={styles.modalView}>
@@ -57,9 +85,14 @@ const Signature = (props: Props) => {
                             <Text style={styles.textTitle}>
                                 Kí tên
                             </Text>
+                            <Pressable
+                                style={[styles.button, styles.buttonClose]}
+                                onPress={onCloseModal}>
+                                <Text style={styles.textStyle}>Đóng</Text>
+                            </Pressable>
                         </View>
-                        <View style={{ width: "100%", height: "60%" }}>
-                            <SignatureCapture
+                        <View style={{ width: "100%", height: "80%" }}>
+                            {/* <SignatureCapture
                                 style={[{ flex: 1 }, styles.signature]}
                                 ref={signatureRef}
                                 onSaveEvent={onSaveEvent}
@@ -72,25 +105,38 @@ const Signature = (props: Props) => {
                                 // minStrokeWidth={4}
                                 // maxStrokeWidth={4}
                                 viewMode={'portrait'}
+                            /> */}
+                            <SignatureScreen
+                                ref={ref}
+                                onEnd={handleEnd}
+                                onOK={handleOK}
+                                onEmpty={handleEmpty}
+                                onClear={handleClear}
+                                onGetData={handleData}
+                                confirmText='Xác nhận'
+                                clearText='Kí lại'
+                                autoClear={false}
+                                descriptionText={"Chữ kí"}
                             />
                         </View>
-                        <View style={styles.btnContainer}>
+
+                        {/* <View style={styles.btnContainer}>
+                            <Pressable
+                                style={[styles.button, styles.buttonReset]}
+                                onPress={handleClear}>
+                                <Text style={styles.textStyle}>Kí lại</Text>
+                            </Pressable>
                             <Pressable
                                 style={[styles.button, styles.buttonClose]}
                                 onPress={onCloseModal}>
-                                <Text style={styles.textStyle}>Đóng</Text>
-                            </Pressable>
-                            <Pressable
-                                style={[styles.button, styles.buttonReset]}
-                                onPress={resetSign}>
-                                <Text style={styles.textStyle}>Kí lại</Text>
+                                <Text style={styles.textStyle}>Xác nhận</Text>
                             </Pressable>
                             <Pressable
                                 style={[styles.button, styles.buttonOpen]}
                                 onPress={saveSign}>
                                 <Text style={styles.textStyle}>Lưu</Text>
                             </Pressable>
-                        </View>
+                        </View> */}
                     </View>
                 </View>
             </Modal >
@@ -161,6 +207,10 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     paddingName: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
         borderBottomColor: "#979797",
         borderBottomWidth: 2,
         backgroundColor: "#363636",
@@ -177,6 +227,6 @@ const styles = StyleSheet.create({
     },
 });
 
-AppRegistry.registerComponent('Signature', () => Signature);
+// AppRegistry.registerComponent('SignatureModal', () => SignatureModal);
 
-export default Signature;
+export default SignatureModal;
