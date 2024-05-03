@@ -130,10 +130,13 @@ const DetailScreen = ({ navigation }: any) => {
             onGoBack={onBack}
             isBackButton={true}
         >
-            {
-                signature
-                && <Image source={signature} />
-            }
+            {/* {signature ? (
+                <Image
+                    resizeMode={"contain"}
+                    style={{ width: 335, height: 114 }}
+                    source={{ uri: signature }}
+                />
+            ) : null} */}
             <View
                 style={{
                     paddingHorizontal: 16,

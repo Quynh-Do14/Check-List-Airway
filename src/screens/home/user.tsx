@@ -1,4 +1,4 @@
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import MainLayout from "../../infrastructure/common/layouts/layout";
 import { Button, List, RadioButton } from "react-native-paper";
 import { useState } from "react";
@@ -51,7 +51,7 @@ const HomeScreen = ({ navigation }: any) => {
                             <View
                                 key={index}
                             >
-                                <TouchableOpacity
+                                <Pressable
                                     onPress={() => onChangeSelect(index)}
                                 >
                                     <View
@@ -61,7 +61,7 @@ const HomeScreen = ({ navigation }: any) => {
                                             {it.name}
                                         </Text>
                                     </View>
-                                </TouchableOpacity>
+                                </Pressable>
 
                                 <View
                                     style={{

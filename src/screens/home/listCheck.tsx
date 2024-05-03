@@ -1,4 +1,4 @@
-import { Image, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import MainLayout from "../../infrastructure/common/layouts/layout";
 import { Button, List, RadioButton, TextInput } from "react-native-paper";
 import { useEffect, useState } from "react";
@@ -33,15 +33,15 @@ const ListCheckScreen = ({ navigation }: any) => {
         navigation.goBack()
     }
 
-    const onChange = (value: string) => {
-        setTextSearch(value)
-        let arrConvert = data.filter((it: any) => it.title.toLowerCase().includes(value.toLowerCase()))
-        setDataFilter(arrConvert)
+    // const onChange = (value: string) => {
+    //     setTextSearch(value)
+    //     let arrConvert = data.filter((it: any) => it.title.toLowerCase().includes(value.toLowerCase()))
+    //     setDataFilter(arrConvert)
 
-    }
-    useEffect(() => {
-        setDataFilter(data)
-    }, [data])
+    // }
+    // useEffect(() => {
+    //     setDataFilter(data)
+    // }, [data])
 
     return (
         <MainLayout
@@ -49,7 +49,7 @@ const ListCheckScreen = ({ navigation }: any) => {
             onGoBack={onBack}
             isBackButton={true}
         >
-            <KeyboardAvoidingView
+            {/* <KeyboardAvoidingView
                 style={{
                     paddingHorizontal: 16,
                 }}>
@@ -67,7 +67,7 @@ const ListCheckScreen = ({ navigation }: any) => {
                             styles.inputStyle
                         ]} />
                 </View>
-            </KeyboardAvoidingView>
+            </KeyboardAvoidingView> */}
             <View style={styles.content}>
                 <View style={styles.paddingName}>
                     <Text style={styles.textTitle}>
@@ -75,10 +75,10 @@ const ListCheckScreen = ({ navigation }: any) => {
                     </Text>
                 </View>
                 {
-                    dataFilter.map((it, index) => {
+                    data.map((it, index) => {
                         return (
                             <View key={index}>
-                                <TouchableOpacity onPress={() => onNavigateDetail(it.content, it.title)}>
+                                <Pressable onPress={() => onNavigateDetail(it.content, it.title)}>
                                     <View
                                         style={styles.checkBoxContainer}
                                     >
@@ -87,7 +87,7 @@ const ListCheckScreen = ({ navigation }: any) => {
                                             {/* <Image source={require('../../../assets/images/arrowLeft.png')} /> */}
                                         </View>
                                     </View>
-                                </TouchableOpacity>
+                                </Pressable>
                             </View>
                         )
                     })
