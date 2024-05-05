@@ -286,7 +286,8 @@ const DetailScreen = ({ navigation }: any) => {
             <DialogNotificationCommon
                 visible={isDialogConfirm}
                 onConfirm={onCloseDialogConfirm}
-                message={"Bạn đã xuất File PDF thành công"} />
+                message={"Bạn đã xuất File PDF thành công"}
+            />
         </MainLayout >
     )
 }

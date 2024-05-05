@@ -211,3 +211,10 @@ export const user = [
         position: "OU"
     },
 ]
+
+export const account = [
+    {
+        username: "towrdoh",
+        password: "Vatm@2024"
+    }
+]

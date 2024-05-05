@@ -1,7 +1,7 @@
 import React from 'react'
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-const MainLayout = ({ onGoBack, isBackButton = false, title, ...props }: any) => {
+const MainLayout = ({ onGoBack, isBackButton = false, title, logout = false, ...props }: any) => {
 
     return (
         <View style={styles.container}>
@@ -12,7 +12,13 @@ const MainLayout = ({ onGoBack, isBackButton = false, title, ...props }: any) =>
                     >
                         {isBackButton &&
                             <View  >
-                                <Image source={require("../../../../assets/images/arrowOutline.png")} />
+                                {
+                                    logout
+                                        ?
+                                        <Image source={require("../../../../assets/images/logout.png")} />
+                                        :
+                                        <Image source={require("../../../../assets/images/arrowOutline.png")} />
+                                }
                             </View>
                         }
                     </TouchableOpacity>

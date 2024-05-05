@@ -6,10 +6,12 @@ import { data, user } from "../../core/common/data";
 import { useRecoilState } from "recoil";
 import { UserSelectState } from "../../core/atoms/userSelect/userSelectState";
 import Constants from "../../core/common/constant";
+import DialogConfirmCommon from "../../infrastructure/common/components/dialog/dialogConfirm";
 
 const HomeScreen = ({ navigation }: any) => {
     const [, setDataUser] = useRecoilState<any>(UserSelectState);
     const [listSelect, setListSelect] = useState<Array<any>>([]);
+    const [isDialogLogout, setIsDialogLogout] = useState(false);
 
     const onNavigateDetail = (it: object, label: string) => {
         setDataUser({
@@ -35,9 +37,23 @@ const HomeScreen = ({ navigation }: any) => {
         })
     }
 
+    const onLogout = () => {
+        navigation.navigate(
+            "LoginScreen",
+        );
+    }
+    const onCloseDialogLogout = () => {
+        setIsDialogLogout(false)
+    }
+    const onOpenDialogLogout = () => {
+        setIsDialogLogout(true)
+    }
     return (
         <MainLayout
             title={"Trang chủ"}
+            onGoBack={onOpenDialogLogout}
+            isBackButton={true}
+            logout={true}
         >
             <View style={styles.content}>
                 <View style={styles.paddingName}>
@@ -94,9 +110,11 @@ const HomeScreen = ({ navigation }: any) => {
                     </View>
                 </ScrollView>
             </View >
-
-
-
+            <DialogConfirmCommon
+                visible={isDialogLogout}
+                onConfirm={onLogout}
+                message={"Bạn có muốn đăng xuất khỏi hệ thống??"}
+                onCancel={onCloseDialogLogout} />
         </MainLayout >
     )
 }
