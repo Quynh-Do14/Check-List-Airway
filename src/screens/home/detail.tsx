@@ -107,20 +107,20 @@ const DetailScreen = ({ navigation }: any) => {
         setModalSignature(true)
     }
 
-    const onChange = (value: string) => {
-        setTextSearch(value)
-        if (checkData.label && checkData.label === "Trực điều hành") {
-            let arrConvert = checkData.data.filter((it: any) => it.primary.toLowerCase().includes(value.toLowerCase()))
-            setDataFilter(arrConvert)
-        }
-        if (checkData.label && checkData.label === "Trực hiệp đồng") {
-            let arrConvert = checkData.data.filter((it: any) => it.secondary.toLowerCase().includes(value.toLowerCase()))
-            setDataFilter(arrConvert)
-        }
-    }
-    useEffect(() => {
-        setDataFilter(checkData.data)
-    }, [checkData])
+    // const onChange = (value: string) => {
+    //     setTextSearch(value)
+    //     if (checkData.label && checkData.label === "Trực điều hành") {
+    //         let arrConvert = checkData.data.filter((it: any) => it.primary.toLowerCase().includes(value.toLowerCase()))
+    //         setDataFilter(arrConvert)
+    //     }
+    //     if (checkData.label && checkData.label === "Trực hiệp đồng") {
+    //         let arrConvert = checkData.data.filter((it: any) => it.secondary.toLowerCase().includes(value.toLowerCase()))
+    //         setDataFilter(arrConvert)
+    //     }
+    // }
+    // useEffect(() => {
+    //     setDataFilter(checkData.data)
+    // }, [checkData])
 
     const onOpenDialogConfirm = () => {
         setIsDialogConfirm(true)
@@ -145,7 +145,6 @@ const DetailScreen = ({ navigation }: any) => {
             <View
                 style={{
                     paddingHorizontal: 16,
-                    paddingVertical: 8
                 }}
             >
                 <Text style={styles.textTitle}>
@@ -195,7 +194,7 @@ const DetailScreen = ({ navigation }: any) => {
                     </TouchableOpacity>
                 </View>
 
-                <KeyboardAvoidingView
+                {/* <KeyboardAvoidingView
                     style={{
                         paddingHorizontal: 16,
                         marginTop: 8,
@@ -214,61 +213,85 @@ const DetailScreen = ({ navigation }: any) => {
                                 styles.inputStyle
                             ]} />
                     </View>
-                </KeyboardAvoidingView>
+                </KeyboardAvoidingView> */}
                 <ScrollView
                     style={{
-                        paddingVertical: 16,
                         paddingHorizontal: 16,
                     }}
                 >
                     <View>
-                        {dataFilter.map((it: any, index: number) => {
+                        {checkData.data.map((it: any, index: number) => {
                             let condtion: any[] = [];
                             condtion = listCheck.filter(item => item.id == it.id)
-                            return (
-                                <View key={index}>
-                                    <View
-                                        style={styles.checkBoxContainer}
-                                    >
-                                        <RadioButton color="#1C1C1E" value={it.id} status={`${condtion[0]?.id == it.id ? "checked" : "unchecked"}`} onPress={() => onChangeCheck(it)} />
+                            if (it.primary && checkData.label === "Trực điều hành") {
+                                return (
+                                    <View key={index}>
                                         <View
-                                            style={styles.flex1}
+                                            style={styles.checkBoxContainer}
                                         >
-                                            <Text style={styles.textBox}>{
-                                                checkData.label && checkData.label === "Trực điều hành"
-                                                    ?
-                                                    it.primary
-                                                    :
-                                                    checkData.label && checkData.label === "Trực hiệp đồng"
-                                                    &&
-                                                    it.secondary
-                                            }</Text>
+                                            <RadioButton color="#1C1C1E" value={it.id} status={`${condtion[0]?.id == it.id ? "checked" : "unchecked"}`} onPress={() => onChangeCheck(it)} />
+                                            <View
+                                                style={styles.flex1}
+                                            >
+                                                <Text style={styles.textBox}>{it.primary}</Text>
+                                            </View>
+                                            {
+                                                condtion[0]?.id == it.id
+                                                &&
+                                                <TouchableOpacity onPress={() => onOpenModal(it)}>
+                                                    <View>
+                                                        {
+                                                            condtion[0]?.note
+                                                                ?
+                                                                <Image source={require('../../../assets/images/noteActive.png')} />
+                                                                :
+                                                                <Image source={require('../../../assets/images/note.png')} />
+                                                        }
+
+                                                    </View>
+                                                </TouchableOpacity>
+                                            }
+
                                         </View>
-                                        {
-                                            condtion[0]?.id == it.id
-                                            &&
-                                            <TouchableOpacity onPress={() => onOpenModal(it)}>
-                                                <View>
-                                                    {
-                                                        condtion[0]?.note
-                                                            ?
-                                                            <Image source={require('../../../assets/images/noteActive.png')} />
-                                                            :
-                                                            <Image source={require('../../../assets/images/note.png')} />
-                                                    }
-
-                                                </View>
-                                            </TouchableOpacity>
-                                        }
-
                                     </View>
-                                </View>
-                            )
+                                )
+                            }
+                            else if (it.secondary && checkData.label === "Trực hiệp đồng") {
+                                return (
+                                    <View key={index}>
+                                        <View
+                                            style={styles.checkBoxContainer}
+                                        >
+                                            <RadioButton color="#1C1C1E" value={it.id} status={`${condtion[0]?.id == it.id ? "checked" : "unchecked"}`} onPress={() => onChangeCheck(it)} />
+                                            <View
+                                                style={styles.flex1}
+                                            >
+                                                <Text style={styles.textBox}>{it.secondary}</Text>
+                                            </View>
+                                            {
+                                                condtion[0]?.id == it.id
+                                                &&
+                                                <TouchableOpacity onPress={() => onOpenModal(it)}>
+                                                    <View>
+                                                        {
+                                                            condtion[0]?.note
+                                                                ?
+                                                                <Image source={require('../../../assets/images/noteActive.png')} />
+                                                                :
+                                                                <Image source={require('../../../assets/images/note.png')} />
+                                                        }
+
+                                                    </View>
+                                                </TouchableOpacity>
+                                            }
+
+                                        </View>
+                                    </View>
+                                )
+                            }
                         }
                         )}
                     </View>
-
-
                 </ScrollView>
             </View >
             <ModalNote
@@ -296,6 +319,9 @@ export default DetailScreen
 
 const styles = StyleSheet.create({
     content: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 12,
         backgroundColor: "#FBF1EF",
         borderWidth: 4,
         borderColor: "#FBF1EF",

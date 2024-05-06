@@ -33,15 +33,15 @@ const ListCheckScreen = ({ navigation }: any) => {
         navigation.goBack()
     }
 
-    // const onChange = (value: string) => {
-    //     setTextSearch(value)
-    //     let arrConvert = data.filter((it: any) => it.title.toLowerCase().includes(value.toLowerCase()))
-    //     setDataFilter(arrConvert)
+    const onChange = (value: string) => {
+        setTextSearch(value)
+        let arrConvert = data.filter((it: any) => it.title.toLowerCase().includes(value.toLowerCase()))
+        setDataFilter(arrConvert)
 
-    // }
-    // useEffect(() => {
-    //     setDataFilter(data)
-    // }, [data])
+    }
+    useEffect(() => {
+        setDataFilter(data)
+    }, [data])
 
     return (
         <MainLayout
@@ -49,7 +49,7 @@ const ListCheckScreen = ({ navigation }: any) => {
             onGoBack={onBack}
             isBackButton={true}
         >
-            {/* <KeyboardAvoidingView
+            <KeyboardAvoidingView
                 style={{
                     paddingHorizontal: 16,
                 }}>
@@ -67,33 +67,34 @@ const ListCheckScreen = ({ navigation }: any) => {
                             styles.inputStyle
                         ]} />
                 </View>
-            </KeyboardAvoidingView> */}
-            <View style={styles.content}>
-                <View style={styles.paddingName}>
-                    <Text style={styles.textTitle}>
-                        {userSelect.name} - {userSelect.position}
-                    </Text>
-                </View>
-                {
-                    data.map((it, index) => {
-                        return (
-                            <View key={index}>
-                                <Pressable onPress={() => onNavigateDetail(it.content, it.title)}>
-                                    <View
-                                        style={styles.checkBoxContainer}
-                                    >
-                                        <View style={styles.flexBox}>
-                                            <Text style={styles.textSelect}>{it.title}</Text>
-                                            {/* <Image source={require('../../../assets/images/arrowLeft.png')} /> */}
+            </KeyboardAvoidingView>
+            <ScrollView>
+                <View style={styles.content}>
+                    <View style={styles.paddingName}>
+                        <Text style={styles.textTitle}>
+                            {userSelect.name} - {userSelect.position}
+                        </Text>
+                    </View>
+                    {
+                        dataFilter.map((it, index) => {
+                            return (
+                                <View key={index}>
+                                    <Pressable onPress={() => onNavigateDetail(it.content, it.title)}>
+                                        <View
+                                            style={styles.checkBoxContainer}
+                                        >
+                                            <View style={styles.flexBox}>
+                                                <Text style={styles.textSelect}>{index + 1}. {it.title}</Text>
+                                                {/* <Image source={require('../../../assets/images/arrowLeft.png')} /> */}
+                                            </View>
                                         </View>
-                                    </View>
-                                </Pressable>
-                            </View>
-                        )
-                    })
-                }
-
-            </View>
+                                    </Pressable>
+                                </View>
+                            )
+                        })
+                    }
+                </View>
+            </ScrollView>
         </MainLayout >
     )
 }

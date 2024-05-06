@@ -30,8 +30,10 @@ const MainLayout = ({ onGoBack, isBackButton = false, title, logout = false, ...
                 </View>
             </View>
             <View style={{
-                paddingTop: 10,
-                paddingBottom: 60
+                display: "flex",
+                flexDirection: "column",
+                flex: 1,
+                marginVertical: 20
             }}>
                 {props.children}
             </View>
@@ -46,7 +48,8 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
         flex: 1,
         display: "flex",
-        flexDirection: "column"
+        flexDirection: "column",
+        gap: 12
     },
     content: {
         flex: 1
